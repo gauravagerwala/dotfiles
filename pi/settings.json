@@ -1,0 +1,15 @@
+{
+  "lastChangelogVersion": "0.84.3",
+  "theme": "dark",
+  "defaultProvider": "github-copilot",
+  "defaultModel": "kimi-k3",
+  "packages": [
+    "npm:pi-mcp-adapter",
+    "npm:pi-cmux",
+    "npm:pi-agent-goal"
+  ],
+  "defaultThinkingLevel": "high",
+  "enabledModels": [
+    "github-copilot/*"
+  ]
+}

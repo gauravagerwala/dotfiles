@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Secrets and machine-local config — never commit
+mcp/secrets.env
+mcp/servers.json
+pi/auth.json
+pi/trust.json
+
+# Generated / machine-local
+mcp/mcp.json
+*.bak
+
+# pi machine state (defense in depth — install.sh symlinks only curated files)
+pi/sessions/
+pi/bin/
+pi/git/
+pi/mcp-cache.json
+pi/mcp-npx-cache.json
+pi/mcp-onboarding.json
+pi/models-store.json
+
+# Reinstallable
+node_modules/
+*.log

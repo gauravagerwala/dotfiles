@@ -2,8 +2,8 @@
 #
 # sync-mcp.sh — sync canonical MCP server config to all AI tools.
 #
-# Source of truth: ~/.config/mcp/servers.json (symlinked from the dotfiles
-# repo). Secrets are NOT stored in that file; it contains ${VAR} placeholders
+# Source of truth: ~/.config/mcp/servers.json (machine-local and never committed).
+# Secrets are NOT stored in that file; it contains ${VAR} placeholders
 # expanded at sync time from:
 #   1. the process environment, or
 #   2. ~/.config/mcp/secrets.env (per-machine, chmod 600, never committed)
@@ -13,6 +13,9 @@
 #   sync-mcp.sh --check   verify all placeholders can be expanded, write nothing
 #
 set -euo pipefail
+
+# Any newly created config can contain expanded credentials.
+umask 077
 
 CANONICAL="$HOME/.config/mcp/servers.json"
 SECRETS_FILE="$HOME/.config/mcp/secrets.env"
@@ -76,6 +79,7 @@ fi
 
 sync_claude_code() {
   local target="$HOME/.claude/settings.json"
+  mkdir -p "$(dirname "$target")"
   if [[ -f "$target" ]]; then
     local merged
     merged=$(jq --argjson servers "$SERVERS" '.mcpServers = $servers' "$target")
@@ -83,6 +87,7 @@ sync_claude_code() {
   else
     jq -n --argjson servers "$SERVERS" '{ mcpServers: $servers }' > "$target"
   fi
+  chmod 600 "$target"
   echo "Synced: $target (mcpServers)"
 }
 
@@ -96,6 +101,7 @@ sync_copilot() {
   else
     jq -n --argjson servers "$SERVERS" '{ mcpServers: $servers }' > "$target"
   fi
+  chmod 600 "$target"
   echo "Synced: $target (mcpServers)"
 }
 
@@ -109,6 +115,7 @@ sync_vscode() {
   else
     jq -n --argjson servers "$SERVERS" '{ servers: $servers }' > "$target"
   fi
+  chmod 600 "$target"
   echo "Synced: $target (servers)"
 }
 
@@ -134,6 +141,7 @@ sync_opencode() {
   else
     jq -n --argjson servers "$oc_servers" '{ "$schema": "https://opencode.ai/config.json", mcp: $servers }' > "$target"
   fi
+  chmod 600 "$target"
   echo "Synced: $target (mcp)"
 }
 

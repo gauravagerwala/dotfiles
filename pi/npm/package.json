@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "pi-agent-goal": "^2026.7.18",
-    "pi-cmux": "^0.1.16",
-    "pi-mcp-adapter": "^2.27.0"
+    "pi-cmux": "^0.1.20",
+    "pi-mcp-adapter": "^2.34.0"
   }
 }

@@ -7,6 +7,7 @@
 #      ~/.pi/agent/.config-backup-<timestamp>/ (per-tool dirs otherwise).
 #   2. Creates symlinks from the live config locations into this repo.
 #   3. Runs npm install in ~/.pi/agent/npm so pi package deps resolve.
+#   4. Enables the gitleaks pre-commit hook when pre-commit is available.
 #
 # Safe to re-run; existing correct symlinks are left alone.
 #
@@ -77,6 +78,14 @@ if command -v npm >/dev/null 2>&1; then
   (cd "$PI_DIR/npm" && npm install)
 else
   echo "  npm not found; pi will install dependencies on next startup"
+fi
+
+echo "==> Enabling secret scanning"
+if command -v pre-commit >/dev/null 2>&1; then
+  (cd "$REPO_DIR" && pre-commit install --install-hooks)
+else
+  echo "  NOTE    pre-commit not found — install it, then run:"
+  echo "          cd $REPO_DIR && pre-commit install --install-hooks"
 fi
 
 echo

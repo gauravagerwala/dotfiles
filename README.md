@@ -24,6 +24,7 @@ cmux/
 mcp/
   sync-mcp.sh                  -> ~/.config/mcp/sync-mcp.sh
   servers.example.json           (template only — your real servers.json stays local)
+.pre-commit-config.yaml          (gitleaks secret scanning)
 install.sh
 ```
 
@@ -43,6 +44,9 @@ Then the per-machine pieces (never committed):
 3. **MCP secrets** — create `~/.config/mcp/secrets.env` (chmod 600) defining
    each `${VAR}` used in your `servers.json`.
 4. Verify with `~/.config/mcp/sync-mcp.sh --check`, then run it to sync.
+5. Install [pre-commit](https://pre-commit.com/) if needed, then enable the
+   repository's secret scanner with `pre-commit install --install-hooks`.
+   `install.sh` does this automatically when `pre-commit` is available.
 
 ## MCP sync
 
@@ -60,7 +64,21 @@ tool's config. `${VAR}` placeholders are expanded from the environment or
 | pi | `~/.config/mcp/mcp.json` (generated, gitignored) |
 
 Targets are tool-specific generated files — edit `servers.json`, re-run
-`sync-mcp.sh`; never edit targets directly.
+`sync-mcp.sh`; never edit targets directly. Because generated targets can
+contain expanded credentials, the sync script creates them with restrictive
+permissions and enforces mode `600` on every target.
+
+## Secret scanning
+
+The pre-commit configuration runs gitleaks against staged changes. To scan the
+whole tracked tree at any time:
+
+```sh
+pre-commit run gitleaks --all-files
+```
+
+The ignore rules cover common credential files as defense in depth, but files
+must still use placeholders such as `${TOKEN}` rather than real secret values.
 
 ## Day-to-day
 

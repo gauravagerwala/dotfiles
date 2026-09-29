@@ -1,8 +1,9 @@
 # dotfiles
 
 Personal configuration for my dev tools, shared across machines via symlinks.
-Currently covers **pi**, **cmux**, and a **generic MCP config sync script**
-for AI tools (Claude Code, Copilot, VS Code, opencode, pi).
+Currently covers **pi**, **cmux**, shared **agent skills** for AI tools
+(opencode, Claude Code, Copilot CLI, VS Code, pi), and a **generic MCP config
+sync script**.
 
 Deliberately generic: no employer-specific hosts, paths, credentials, or
 project references are tracked in this repo.
@@ -14,11 +15,14 @@ pi/
   settings.json                -> ~/.pi/agent/settings.json
   extensions/
     operation-permissions.ts   -> ~/.pi/agent/extensions/operation-permissions.ts
-  skills/
-    cmux-browser/              -> ~/.pi/agent/skills/cmux-browser
   npm/
     package.json               -> ~/.pi/agent/npm/package.json
     package-lock.json          -> ~/.pi/agent/npm/package-lock.json
+skills/
+  cmux-browser/                -> every tool (see Skills below)
+  deslop/
+  test-audit/
+  technical-documentation/
 cmux/
   cmux.json                    -> ~/.config/cmux/cmux.json
 mcp/
@@ -47,6 +51,34 @@ Then the per-machine pieces (never committed):
 5. Install [pre-commit](https://pre-commit.com/) if needed, then enable the
    repository's secret scanner with `pre-commit install --install-hooks`.
    `install.sh` does this automatically when `pre-commit` is available.
+
+## Skills
+
+`skills/` holds tool-agnostic agent skills. `install.sh` symlinks every
+directory in it into each tool's skills location, so one edit here is one edit
+everywhere.
+
+| Tool | Skills directory |
+|------|------------------|
+| opencode, Copilot CLI, VS Code Copilot | `~/.agents/skills/` |
+| Claude Code | `~/.claude/skills/` |
+| Copilot CLI (older builds) | `~/.copilot/skills/` |
+| pi | `~/.pi/agent/skills/` |
+
+Add a skill by creating `skills/<name>/SKILL.md` with `name` and `description`
+frontmatter and re-running `install.sh`; nothing else needs editing. A skill
+directory already present in a target is moved to the timestamped backup before
+being replaced, so local edits are never silently lost.
+
+Current skills:
+
+- `cmux-browser` — browser automation through the cmux CLI.
+- `deslop` — diff-scoped cleanup of AI-slop comments, defensive checks, and
+  type-laundering before code review.
+- `test-audit` — authoring gate and audit workflow for test value, junk
+  patterns, and test-only production seams.
+- `technical-documentation` — build and review of technical docs and agent
+  instruction files (`AGENTS.md` / `CONTRIBUTING.md`).
 
 ## MCP sync
 

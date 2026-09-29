@@ -23,6 +23,12 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PI_DIR="$HOME/.pi/agent"
 CMUX_DIR="$HOME/.config/cmux"
 MCP_DIR="$HOME/.config/mcp"
+SKILL_TARGETS=(
+  "$HOME/.agents/skills"
+  "$HOME/.claude/skills"
+  "$HOME/.copilot/skills"
+  "$PI_DIR/skills"
+)
 BACKUP_ROOT="$PI_DIR/.config-backup-$(date +%Y%m%d-%H%M%S)"
 
 backup_created=false
@@ -54,9 +60,18 @@ link() {
 echo "==> Linking pi config"
 link "$REPO_DIR/pi/settings.json"                       "$PI_DIR/settings.json"
 link "$REPO_DIR/pi/extensions/operation-permissions.ts" "$PI_DIR/extensions/operation-permissions.ts"
-link "$REPO_DIR/pi/skills/cmux-browser"                 "$PI_DIR/skills/cmux-browser"
 link "$REPO_DIR/pi/npm/package.json"                    "$PI_DIR/npm/package.json"
 link "$REPO_DIR/pi/npm/package-lock.json"               "$PI_DIR/npm/package-lock.json"
+
+echo "==> Linking shared skills"
+shopt -s nullglob
+for skill_dir in "$REPO_DIR"/skills/*/; do
+  src="${skill_dir%/}"
+  for target in "${SKILL_TARGETS[@]}"; do
+    link "$src" "$target/$(basename "$src")"
+  done
+done
+shopt -u nullglob
 
 echo "==> Linking cmux config"
 link "$REPO_DIR/cmux/cmux.json" "$CMUX_DIR/cmux.json"

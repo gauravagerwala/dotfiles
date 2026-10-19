@@ -44,3 +44,8 @@ pi/models-store.json
 # Reinstallable
 node_modules/
 *.log
+
+# User understanding is local state, not shared skill source.
+.understanding/
+codex/understanding/
+__pycache__/

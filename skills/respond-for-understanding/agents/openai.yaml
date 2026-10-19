@@ -1,0 +1,6 @@
+interface:
+  display_name: "Respond for understanding"
+  short_description: "Explain coding answers using evidence of understanding"
+  default_prompt: "Use $respond-for-understanding to answer at the depth I need, using my selected understanding memory."
+policy:
+  allow_implicit_invocation: true

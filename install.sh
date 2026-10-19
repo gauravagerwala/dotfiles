@@ -6,8 +6,9 @@
 #   1. Backs up any existing files it is about to replace to
 #      ~/.pi/agent/.config-backup-<timestamp>/ (per-tool dirs otherwise).
 #   2. Creates symlinks from the live config locations into this repo.
-#   3. Runs npm install in ~/.pi/agent/npm so pi package deps resolve.
-#   4. Enables the gitleaks pre-commit hook when pre-commit is available.
+#   3. Adds Codex understanding routing and creates local memory if absent.
+#   4. Runs npm install in ~/.pi/agent/npm so pi package deps resolve.
+#   5. Enables the gitleaks pre-commit hook when pre-commit is available.
 #
 # Safe to re-run; existing correct symlinks are left alone.
 #
@@ -72,6 +73,10 @@ for skill_dir in "$REPO_DIR"/skills/*/; do
   done
 done
 shopt -u nullglob
+
+echo "==> Configuring Codex understanding workflow"
+source "$REPO_DIR/codex/understanding.sh"
+setup_understanding "$REPO_DIR/codex" "${CODEX_HOME:-$HOME/.codex}"
 
 echo "==> Linking cmux config"
 link "$REPO_DIR/cmux/cmux.json" "$CMUX_DIR/cmux.json"

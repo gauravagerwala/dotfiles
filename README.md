@@ -2,7 +2,7 @@
 
 Personal configuration for my dev tools, shared across machines via symlinks.
 Currently covers **pi**, **cmux**, shared **agent skills** for AI tools
-(opencode, Claude Code, Copilot CLI, VS Code, pi), and a **generic MCP config
+(Codex, opencode, Claude Code, Copilot CLI, VS Code, pi), and a **generic MCP config
 sync script**.
 
 Deliberately generic: no employer-specific hosts, paths, credentials, or
@@ -23,6 +23,13 @@ skills/
   deslop/
   test-audit/
   technical-documentation/
+  respond-for-understanding/
+  learning-retro/
+codex/
+  AGENTS.md                      (understanding routing fragment)
+  understanding.sh               (sourced by install.sh)
+  understanding-memory.template.md (empty template; live memory stays local)
+  evals/scenarios.md             (behavioral evaluation prompts)
 cmux/
   cmux.json                    -> ~/.config/cmux/cmux.json
 mcp/
@@ -60,7 +67,7 @@ everywhere.
 
 | Tool | Skills directory |
 |------|------------------|
-| opencode, Copilot CLI, VS Code Copilot | `~/.agents/skills/` |
+| Codex, opencode, Copilot CLI, VS Code Copilot | `~/.agents/skills/` |
 | Claude Code | `~/.claude/skills/` |
 | Copilot CLI (older builds) | `~/.copilot/skills/` |
 | pi | `~/.pi/agent/skills/` |
@@ -79,6 +86,52 @@ Current skills:
   patterns, and test-only production seams.
 - `technical-documentation` — build and review of technical docs and agent
   instruction files (`AGENTS.md` / `CONTRIBUTING.md`).
+- `respond-for-understanding` — adapt substantive coding answers to evidence
+  of the user's understanding, avoiding repeated background.
+- `learning-retro` — review session evidence and update a brief understanding
+  memory when requested.
+
+## Codex understanding workflow
+
+The existing `install.sh` installs both learning skills through the shared
+symlink loop. It also merges the marked `codex/AGENTS.md` routing fragment into
+`~/.codex/AGENTS.md` and initializes an empty local memory at
+`~/.codex/understanding/default/memory.md`. When `CODEX_HOME` is configured,
+both paths use that directory instead. A nonempty `AGENTS.override.md` receives
+the routing block in place of `AGENTS.md`.
+
+Existing instructions outside the marked block, existing symlinks, and personal
+memory are preserved on reinstallation. Setup creates memory as a mutable local
+file outside the shared skill source. The tracked template contains no user knowledge.
+The default profile assumes a single user; shared sessions must explicitly
+select their own profile and memory. Relative memory paths resolve from the
+applicable routing file's directory, not from a project's current directory.
+
+Ask normal coding questions. The response skill description supports discovery;
+the routing rule requests its use before substantive answers. After a useful
+session, request `$learning-retro Review this session and update my understanding
+memory.` Explicitly request a retro or correction to write memory; routine
+answers only read it. You can request a read-only proposal or ask the retro to
+correct or forget an entry.
+
+The flat file distinguishes exposure, self-reported understanding, demonstrated
+understanding, and specific gaps. An explanation delivered or accepted generated
+code never establishes demonstrated understanding. Current instructions and
+evidence override saved claims. Retros keep the whole file within 600 words,
+15 concepts, and 5 preference bullets. One writer at a time is supported.
+See the [memory contract](skills/respond-for-understanding/references/memory-contract.md)
+and [behavioral evaluation scenarios](codex/evals/scenarios.md).
+
+The skills are Markdown instructions and need no Python at runtime. The Bash
+setup uses standard `awk`, `cmp`, and `mktemp`. Run setup-preservation checks
+with `python3 -m unittest discover -s codex/tests -v` and syntax checks with
+`bash -n install.sh codex/understanding.sh`. These checks do not establish
+model invocation or learning effectiveness; the scenarios cover those separately.
+
+Matt Pocock's [retro](https://github.com/mattpocock/skills/releases) motivated the
+session-review loop. This implementation adds scoped understanding evidence and
+does not depend on that skill. Codex guidance requests behavior; it is not a
+guaranteed response hook. See [Codex skills](https://developers.openai.com/codex/skills).
 
 ## MCP sync
 
@@ -135,6 +188,7 @@ must still use placeholders such as `${TOKEN}` rather than real secret values.
 | `~/.pi/agent/models-store.json` | Auto-refreshed model catalog cache |
 | `~/.pi/agent/mcp-*.json` | MCP caches/onboarding state |
 | `~/.pi/agent/npm/node_modules/` | Reinstalled from package-lock |
+| `~/.codex/understanding/` (or `$CODEX_HOME/understanding/`) | Personal understanding memory |
 | `~/Library/Application Support/cmux/` | cmux runtime state (sessions, search DB) |
 
 ## cmux notes

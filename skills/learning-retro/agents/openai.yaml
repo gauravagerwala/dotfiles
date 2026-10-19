@@ -1,0 +1,6 @@
+interface:
+  display_name: "Learning retro"
+  short_description: "Review learning evidence and update understanding memory"
+  default_prompt: "Use $learning-retro to review this session and update my selected understanding memory from actual evidence."
+policy:
+  allow_implicit_invocation: true
